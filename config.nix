@@ -42,6 +42,9 @@
   boot.loader.systemd-boot.enable = lib.mkDefault true;
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
+  # Workaround for Synaptics firmware PR3584089 touchpad issues.
+  boot.kernelParams = [ "psmouse.synaptics_intertouch=0" ];
+
   # ------------------------------------------------------------
   # NIX SETTINGS
   # ------------------------------------------------------------
@@ -55,10 +58,11 @@
 
   # ------------------------------------------------------------
   # LOCALE & TIME
-  # Override time.timeZone per machine.
-  # Full list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  # Timezone is detected automatically via geoclue2.
+  # To pin a static timezone instead, set time.timeZone in config-override.nix:
+  #   time.timeZone = "America/Sao_Paulo";
   # ------------------------------------------------------------
-  time.timeZone = lib.mkDefault "UTC";  # override per machine, e.g. "America/Sao_Paulo"
+  services.automatic-timezone.enable = true;
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS        = "en_US.UTF-8";
@@ -82,6 +86,14 @@
   # DEFAULT BROWSER — Firefox
   # ------------------------------------------------------------
   programs.firefox.enable = true;
+
+  # ------------------------------------------------------------
+  # NIX-LD — run dynamically linked executables (rustup, etc.)
+  # Sets up a stub ld-linux so FHS binaries work without patching.
+  # ------------------------------------------------------------
+  programs.nix-ld.enable = true;
+  # To fix "missing shared library" errors for specific binaries:
+  # programs.nix-ld.libraries = with pkgs; [ openssl zlib stdenv.cc.cc ];
 
   # ------------------------------------------------------------
   # DOCKER

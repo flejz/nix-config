@@ -19,7 +19,7 @@
   networking.hostName = "cybermancer";
 
   # Timezone — see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  time.timeZone = "America/Sao_Paulo";
+  # time.timeZone = "Europe/Berlin";
 
   # ---- App overrides (uncomment to install) ------------------
   # cfg.apps.discord.enable  = true;
