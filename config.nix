@@ -62,7 +62,7 @@
   # To pin a static timezone instead, set time.timeZone in config-override.nix:
   #   time.timeZone = "America/Sao_Paulo";
   # ------------------------------------------------------------
-  services.automatic-timezone.enable = true;
+  services.automatic-timezoned.enable = true;
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS        = "en_US.UTF-8";

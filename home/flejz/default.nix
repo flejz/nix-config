@@ -6,6 +6,7 @@
     ../../modules/home/packages.nix
     ../../modules/home/shell.nix
     ../../modules/home/git.nix
+    ../../modules/home/gpg.nix
     ../../modules/home/dotfiles.nix
   ];
 

@@ -4,8 +4,13 @@
   home.packages = with pkgs; [
     # ---- Version control & secrets --------------------------
     git
+    gh
     gnupg
     pass
+    ripgrep
+    wl-clipboard
+    pinentry-all
+    tree
 
     # ---- Editors & terminal tools ---------------------------
     neovim
