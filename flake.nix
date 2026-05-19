@@ -31,9 +31,10 @@
           # 3. Home Manager as NixOS module (single nixos-rebuild switch)
           home-manager.nixosModules.home-manager
           {
-            home-manager.useGlobalPkgs   = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.flejz     = import ./home/flejz/home.nix;
+            home-manager.useGlobalPkgs        = true;
+            home-manager.useUserPackages      = true;
+            home-manager.backupFileExtension  = "bak";
+            home-manager.users.flejz          = import ./home/flejz/home.nix;
           }
         ];
       };
