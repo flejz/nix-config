@@ -221,6 +221,8 @@
         "$mainMod, C, killactive,"
         "$mainMod, E, exec, dolphin"
         "$mainMod, V, togglefloating,"
+        "$mainMod, F, fullscreen, 0"
+        "$mainMod, M, fullscreen, 1"
         "$mainMod, R, exec, hyprlauncher"
         "$mainMod, T, layoutmsg, togglesplit"
         "$mainMod, slash, exec, kitty --class hypr-binds -e sh -c 'grep -E \"^bind\" ~/.config/hypr/hyprland.conf | less -K'"
