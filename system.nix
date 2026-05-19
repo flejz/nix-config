@@ -7,7 +7,7 @@ in
   options.cfg = {
     desktop = lib.mkOption {
       type    = lib.types.enum [ "gnome" "kde" "hyprland" "none" ];
-      default = "gnome";
+      default = "hyprland";
       description = ''
         Desktop environment. Override per machine in machines/<name>/config-override.nix.
           "gnome"    — GNOME on Wayland via GDM
@@ -30,8 +30,6 @@ in
     {
       boot.loader.systemd-boot.enable       = lib.mkDefault true;
       boot.loader.efi.canTouchEfiVariables  = lib.mkDefault true;
-      # Workaround for Synaptics firmware PR3584089 touchpad issues.
-      boot.kernelParams = [ "psmouse.synaptics_intertouch=0" ];
 
       nix.settings = {
         experimental-features = [ "nix-command" "flakes" ];
@@ -54,9 +52,6 @@ in
       };
 
       networking.networkmanager.enable       = true;
-      networking.firewall.allowedTCPPorts    = [ 5900 ];
-      # GNOME Remote Desktop (Wayland-native VNC, port 5900)
-      services.gnome.gnome-remote-desktop.enable = true;
 
       programs.firefox.enable = true;
 
@@ -124,6 +119,7 @@ in
         enable       = true;
         extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
       };
+      home-manager.users.flejz.home.packages = with pkgs; [ hyprlauncher kdePackages.dolphin ];
     })
   ];
 }
