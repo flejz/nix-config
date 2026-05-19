@@ -2,8 +2,8 @@
 # ============================================================
 # MACHINE OVERRIDES — cybermancer (laptop)
 #
-# Only put values here that DIFFER from config.nix defaults.
-# All available options are documented in ../../config.nix.
+# Only put values here that DIFFER from system.nix defaults.
+# All available options are documented in ../../system.nix.
 #
 # To add a new machine:
 #   cp -r machines/cybermancer machines/<newhostname>

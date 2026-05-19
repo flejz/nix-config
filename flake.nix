@@ -22,22 +22,18 @@
       buildMachine = name: lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          # 1. Option definitions (must come before config that uses them)
-          ./modules/nixos/desktop.nix
-          ./modules/nixos/apps.nix
+          # 1. Base system config + option definitions (applies to all machines)
+          ./system.nix
 
-          # 2. Base config with documented defaults (applies to all machines)
-          ./config.nix
-
-          # 3. Machine-specific overrides (hostname, timezone, etc.)
+          # 2. Machine-specific overrides (hostname, hardware, etc.)
           ./machines/${name}/config-override.nix
 
-          # 4. Home Manager as NixOS module (single nixos-rebuild switch)
+          # 3. Home Manager as NixOS module (single nixos-rebuild switch)
           home-manager.nixosModules.home-manager
           {
-            home-manager.useGlobalPkgs = true;
+            home-manager.useGlobalPkgs   = true;
             home-manager.useUserPackages = true;
-            home-manager.users.flejz = import ./home/flejz/default.nix;
+            home-manager.users.flejz     = import ./home/flejz/home.nix;
           }
         ];
       };
