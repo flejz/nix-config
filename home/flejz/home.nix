@@ -11,7 +11,7 @@
     # Remote desktop
     remmina
     # Editors & terminal
-    neovim tmux
+    neovim tmux kitty
     # Go
     go
     # Python
