@@ -1,19 +1,35 @@
-# system.nix — NixOS base config + custom option definitions for all machines.
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 let
   desktop = config.cfg.desktop;
 in
 {
+  imports = [
+    ./modules/bootloader.nix
+    ./modules/fonts.nix
+    ./modules/theme.nix
+    ./modules/display-manager.nix
+    ./modules/bluetooth.nix
+    ./modules/power.nix
+    ./modules/networking.nix
+    ./modules/dns.nix
+    ./modules/security.nix
+    ./modules/fingerprint.nix
+    ./modules/virtualisation.nix
+    ./modules/auto-upgrade.nix
+    ./modules/sound.nix
+    ./modules/nix-settings.nix
+    ./modules/dev.nix
+    ./modules/ai.nix
+    ./modules/terminal.nix
+    ./modules/services.nix
+  ];
+
   options.cfg = {
     desktop = lib.mkOption {
       type    = lib.types.enum [ "gnome" "kde" "hyprland" "none" ];
       default = "hyprland";
       description = ''
         Desktop environment. Override per machine in machines/<name>/config-override.nix.
-          "gnome"    — GNOME on Wayland via GDM
-          "kde"      — KDE Plasma 6 on Wayland via SDDM
-          "hyprland" — Hyprland tiling WM via GDM
-          "none"     — No DE/WM managed by Nix
       '';
     };
 
@@ -28,60 +44,26 @@ in
 
   config = lib.mkMerge [
     {
-      boot.loader.systemd-boot.enable       = lib.mkDefault true;
-      boot.loader.efi.canTouchEfiVariables  = lib.mkDefault true;
-
-      nix.settings = {
-        experimental-features = [ "nix-command" "flakes" ];
-        auto-optimise-store   = true;
-      };
       nixpkgs.config.allowUnfree = true;
 
       services.automatic-timezoned.enable = true;
       i18n.defaultLocale = "en_US.UTF-8";
-      i18n.extraLocaleSettings = {
-        LC_ADDRESS        = "en_US.UTF-8";
-        LC_IDENTIFICATION = "en_US.UTF-8";
-        LC_MEASUREMENT    = "en_US.UTF-8";
-        LC_MONETARY       = "en_US.UTF-8";
-        LC_NAME           = "en_US.UTF-8";
-        LC_NUMERIC        = "en_US.UTF-8";
-        LC_PAPER          = "en_US.UTF-8";
-        LC_TELEPHONE      = "en_US.UTF-8";
-        LC_TIME           = "en_US.UTF-8";
-      };
 
-      networking.networkmanager.enable       = true;
+      programs.kdeconnect.enable = true;
+      programs.firefox.enable    = true;
 
-      programs.firefox.enable = true;
-
-      # nix-ld: run dynamically linked executables (rustup, etc.)
-      programs.nix-ld.enable = true;
-      programs.nix-ld.libraries = with pkgs; [
-        (pkgs.runCommand "libxml2-compat" {} ''
-          mkdir -p $out/lib
-          ln -s ${pkgs.libxml2.out}/lib/libxml2.so.16 $out/lib/libxml2.so.2
-        '')
+      programs.nix-ld.enable     = true;
+      programs.nix-ld.libraries  = with pkgs; [
         zlib
         stdenv.cc.cc.lib
         libxml2
       ];
 
-      virtualisation.docker.enable = true;
-
-      services.pipewire = {
-        enable           = true;
-        alsa.enable      = true;
-        alsa.support32Bit = true;
-        pulse.enable     = true;
-      };
-      services.pulseaudio.enable = false;
-
       users.users.flejz = {
         isNormalUser = true;
         description  = "flejz";
-        shell        = pkgs.bash;
-        extraGroups  = [ "wheel" "networkmanager" "video" "audio" "docker" ];
+        shell        = pkgs.fish;  # Fish is now the default shell
+        extraGroups  = [ "wheel" "video" "audio" "input" "podman" ];
       };
 
       system.stateVersion = "25.11";
@@ -95,31 +77,28 @@ in
     }
 
     (lib.mkIf (desktop == "gnome") {
-      services.xserver.enable                  = true;
-      services.desktopManager.gnome.enable     = true;
-      services.displayManager.gdm.enable       = true;
-      services.displayManager.gdm.wayland      = true;
-      environment.gnome.excludePackages = with pkgs; [
-        gnome-tour
-        epiphany
-      ];
+      services.xserver.enable              = true;
+      services.desktopManager.gnome.enable = true;
+      services.displayManager.gdm.enable   = true;
+      services.displayManager.gdm.wayland  = true;
+      environment.gnome.excludePackages = with pkgs; [ gnome-tour epiphany ];
     })
 
     (lib.mkIf (desktop == "kde") {
-      services.desktopManager.plasma6.enable       = true;
-      services.displayManager.sddm.enable          = true;
-      services.displayManager.sddm.wayland.enable  = true;
+      services.desktopManager.plasma6.enable      = true;
+      services.displayManager.sddm.enable         = true;
+      services.displayManager.sddm.wayland.enable = true;
     })
 
     (lib.mkIf (desktop == "hyprland") {
-      programs.hyprland.enable            = true;
-      services.displayManager.gdm.enable  = true;
-      services.displayManager.gdm.wayland = true;
+      programs.hyprland.enable    = true;
+      programs.hyprland.withUWSM  = true;
+      # display-manager.nix provides greetd — GDM is intentionally not enabled here
       xdg.portal = {
         enable       = true;
         extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
+        config.common.default = "*";
       };
-      home-manager.users.flejz.home.packages = with pkgs; [ hyprlauncher kdePackages.dolphin ];
     })
   ];
 }
